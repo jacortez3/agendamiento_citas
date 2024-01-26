@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-
 function CrearCita() {
   console.log('Rendering CrearCita component');
   const [selectedDate, setSelectedDate] = useState(null);
@@ -17,8 +15,32 @@ function CrearCita() {
 
   const handleConfirmClick = () => {
     if (selectedDate) {
-      alert(`Se creará una cita el día ${selectedDate}, confirma tu cita`);
-      // Aquí puedes enviar la cita al servidor o almacenarla en el estado global de la aplicación
+      const appointment = {
+        date: selectedDate,
+      };
+
+      // Valida la fecha
+      if (!appointment.date || !appointment.date.isValid()) {
+        alert('La fecha no es válida');
+        return;
+      }
+
+      // Especifica el formato de la fecha
+      appointment.date = appointment.date.toISOString();
+
+      // Envía los datos al servidor
+      fetch('http://localhost:3001/appointments', {
+        method: 'POST',
+        body: JSON.stringify(appointment),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('La cita se creó correctamente');
+          } else {
+            alert('Ocurrió un error al crear la cita');
+          }
+        });
     }
   };
 
